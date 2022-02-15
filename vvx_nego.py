@@ -13,7 +13,7 @@ import base64
 
 class VoicevoxNegotiation:
     #コンストラクト時、指定したアドレスとポートでエンジンを起動する
-    def __init__(self, address = "127.0.0.1", port = 50021):
+    def __init__(self, engine_path, address = "127.0.0.1", port = 50021):
         self.VVN_OK = 0
         self.VVN_GENERAL_ERROR = 1
         self.VVN_FAILD_TO_REACH = 2
@@ -34,7 +34,7 @@ class VoicevoxNegotiation:
         self.speakers = {}
         self.speaker_info ={}
 
-        if self.start_voicevox_engine(address, port, enable_print=True) == self.VVN_OK:
+        if self.start_voicevox_engine(engine_path, address, port, enable_print=True) == self.VVN_OK:
             None
         else:
             print("キーを入力するとプログラムを終了します")
@@ -45,7 +45,7 @@ class VoicevoxNegotiation:
 
     #Voicevoxエンジン起動処理
     #既にポートが塞がっていた場合実行中のエンジンが有る想定でエンジンの起動をスキップする
-    def start_voicevox_engine(self, address="127.0.0.1", port=50021, enable_print=False):
+    def start_voicevox_engine(self, engine_path, address="127.0.0.1", port=50021, enable_print=False):
         self.port = port
         self.address = address
         self.VVE_Url = "http://"+address+":"+str(port)
@@ -59,8 +59,7 @@ class VoicevoxNegotiation:
         except:
             client.close()
             if enable_print == True: print("Voicevoxエンジンを起動します。id("+str(len(self.vvengine))+")")
-            #self.vvengine = subprocess.Popen((os.getcwd()+"\\Voicevox_engine\\windows-cpu\\run.exe", "--port", str(self.port), "--host", self.address))
-            self.vvengine.append(subprocess.Popen((os.getcwd()+"\\Voicevox_engine\\windows-nvidia\\run.exe", "--port", str(self.port), "--host", self.address)))
+            self.vvengine.append(subprocess.Popen((engine_path, "--port", str(self.port), "--host", self.address)))
             atexit.register(self.terminate_all_engine)
         if self.check_engine_alive() == self.VVN_OK:
             if enable_print == True:
